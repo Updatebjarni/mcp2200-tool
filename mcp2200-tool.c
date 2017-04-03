@@ -117,7 +117,9 @@ int main(int argc, char *argv[]){
     };
   int opt;
   char *optstr="+s:c:o:ip:P:r:w:DS:C:T:R:B:I:F:b:dhu:U:";
-  int vid=-1, pid=-1, bus=-1, port=-1;
+  long vid=-1, pid=-1;
+  unsigned int temp_vid, temp_pid;
+  int bus=-1, port=-1;
   char dummy;
   long val, err=0;
   int eewaddr, eedata;
@@ -128,10 +130,11 @@ int main(int argc, char *argv[]){
     if(opt=='?')break;
     switch(opt){
       case 'u':
-        if(sscanf(optarg, "%x:%x%c", &vid, &pid, &dummy)!=2){
+        if(sscanf(optarg, "%x:%x%c", &temp_vid, &temp_pid, &dummy)!=2){
           fprintf(stderr, "Specify device ID as \"VID:PID\"\n");
           return 1;
           }
+        vid=temp_vid; pid=temp_pid;
         break;
       case 'U':
         if(sscanf(optarg, "%i:%i%c", &bus, &port, &dummy)!=2){

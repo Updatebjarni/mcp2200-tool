@@ -1,7 +1,13 @@
 #ifndef MCP2200_LIB_H
 #define MCP2200_LIB_H
 
-#include<libusb.h>
+#include "ac_cfg.h"
+
+#if defined(HAVE_LIBUSB_1_0_LIBUSB_H)
+#include <libusb-1.0/libusb.h>
+#else
+#include <libusb.h>
+#endif
 
 #define MCP2200_VID 0x04d8
 #define MCP2200_PID 0x00df

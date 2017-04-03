@@ -1,4 +1,4 @@
-CFLAGS=-Wall $(shell pkg-config libusb-1.0 --cflags) -std=c99
+CFLAGS=-Wall $(shell pkg-config libusb-1.0 --cflags) -std=c99 -pedantic
 LDFLAGS=$(shell pkg-config libusb-1.0 --libs)
 
 

@@ -18,6 +18,8 @@ int mcp2200_open(struct mcp2200 *m, long vid, long pid, long bus, long port){
   struct libusb_config_descriptor *conf_desc=0;
 //  unsigned char buf[256];
   int ret=0;
+  ssize_t i;
+  int j, k, l;
 
   m->interface=-1;
 
@@ -27,7 +29,7 @@ int mcp2200_open(struct mcp2200 *m, long vid, long pid, long bus, long port){
   libusb_init(0);
 
   ndevs=libusb_get_device_list(0, &devs);
-  for(ssize_t i=0; i<ndevs; ++i){
+  for(i=0; i<ndevs; ++i){
     libusb_get_device_descriptor(devs[i], &dev_desc);
     if(   dev_desc.idVendor!=vid
        || dev_desc.idProduct!=pid
@@ -40,9 +42,9 @@ int mcp2200_open(struct mcp2200 *m, long vid, long pid, long bus, long port){
     libusb_get_active_config_descriptor(devs[i], &conf_desc);
 
     const struct libusb_interface *interface=conf_desc->interface;
-    for(int i=0; i<conf_desc->bNumInterfaces; ++i, ++interface){
+    for(j=0; j<conf_desc->bNumInterfaces; ++j, ++interface){
       const struct libusb_interface_descriptor *alt=interface->altsetting;
-      for(int j=0; j<conf_desc->interface[i].num_altsetting; ++j, ++alt){
+      for(k=0; k<conf_desc->interface[j].num_altsetting; ++k, ++alt){
         if(alt->bInterfaceClass==3){
           m->interface=alt->bInterfaceNumber;
 
@@ -52,7 +54,7 @@ int mcp2200_open(struct mcp2200 *m, long vid, long pid, long bus, long port){
             handle, m->interface, alt->bAlternateSetting);
 
           const struct libusb_endpoint_descriptor *ep=alt->endpoint;
-          for(int k=0; k<alt->bNumEndpoints; ++k, ++ep){
+          for(l=0; l<alt->bNumEndpoints; ++l, ++ep){
             if((ep->bmAttributes&3) == LIBUSB_TRANSFER_TYPE_INTERRUPT){
               if((ep->bEndpointAddress&0x80) == LIBUSB_ENDPOINT_IN)
                 m->intin=ep->bEndpointAddress;
