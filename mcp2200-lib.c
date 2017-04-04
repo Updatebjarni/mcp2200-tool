@@ -145,6 +145,16 @@ int mcp2200_read_all(struct mcp2200 *mcp2200, struct mcp2200_conf *conf){
   return ret;
   }
 
+int mcp2200_gpio_get(struct mcp2200 *mcp2200, int *bits){
+  struct mcp2200_conf conf;
+  int ret;
+
+  if((ret=mcp2200_read_all(mcp2200, &conf)))return ret;
+  *bits=conf.pinvals;
+
+  return 0;
+  }
+
 int mcp2200_configure(struct mcp2200 *mcp2200, struct mcp2200_conf *conf){
   int sent;
   unsigned int baudrate_divisor;

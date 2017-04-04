@@ -39,6 +39,7 @@ int mcp2200_gpio_on_off(struct mcp2200 *mcp2200, int onmask, int offmask);
 int mcp2200_gpio_on(struct mcp2200 *mcp2200, int onmask);
 int mcp2200_gpio_off(struct mcp2200 *mcp2200, int offmask);
 int mcp2200_gpio_set(struct mcp2200 *mcp2200, int bits);
+int mcp2200_gpio_get(struct mcp2200 *mcp2200, int *bits);
 int mcp2200_read_all(struct mcp2200 *mcp2200, struct mcp2200_conf *conf);
 int mcp2200_configure(struct mcp2200 *mcp2200, struct mcp2200_conf *conf);
 int mcp2200_read_eeprom(struct mcp2200 *mcp2200, int address);
