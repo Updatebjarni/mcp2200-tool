@@ -1,11 +1,21 @@
+#include<string.h>
 #include"mcp2200-lib.h"
 
 
+#define MCP2200_CMD_SET_DEVID      1
 #define MCP2200_CMD_GPIO_ON_OFF    8
 #define MCP2200_CMD_CONFIGURE     16
 #define MCP2200_CMD_READ_EEPROM   32
 #define MCP2200_CMD_WRITE_EEPROM  64
 #define MCP2200_CMD_READ_ALL     128
+
+#define MCP2200_DEVID_PID_VID_NUMBERS  0
+#define MCP2200_DEVID_MANUFACTURER_STR 1
+#define MCP2200_DEVID_PRODUCT_STR      2
+
+// Is the serial number string 3?
+// No, apparently not.
+
 
 static unsigned char report[16];
 
@@ -200,6 +210,57 @@ int mcp2200_write_eeprom(struct mcp2200 *mcp2200, int address, int data){
   report[1]=address;
   report[2]=data;
 
+  return libusb_interrupt_transfer(
+    mcp2200->handle, mcp2200->intout, report, 16, &sent, 5000
+    );
+  }
+
+void make_str_descriptor(unsigned char *to, char *from){
+  // *** This is nonsense really; it needs to understand locales.
+  int i;
+  for(i=0; (i<126) && from[i]; ++i){
+    to[i*2+2]=from[i]; to[i*2+3]=0;
+    }
+  to[0]=i*2+2;
+  to[1]=LIBUSB_DT_STRING;
+  }
+
+int mcp2200_set_string(struct mcp2200 *mcp2200, int which, char *str){
+  static unsigned char buf[256];
+  int sent, ret;
+
+  report[0]=MCP2200_CMD_SET_DEVID;
+  report[1]=which;
+  make_str_descriptor(buf, str);
+  for(int i=0; i<16; ++i){
+    report[2]=i;
+    memcpy(report+3, buf+i*8, 8);
+    ret=libusb_interrupt_transfer(
+      mcp2200->handle, mcp2200->intout, report, 16, &sent, 5000
+      );
+    if(ret)break;
+    }
+
+  return ret;
+  }
+
+int mcp2200_set_manufacturer_string(struct mcp2200 *mcp2200, char *str){
+  return mcp2200_set_string(mcp2200, MCP2200_DEVID_MANUFACTURER_STR, str);
+  }
+
+int mcp2200_set_product_string(struct mcp2200 *mcp2200, char *str){
+  return mcp2200_set_string(mcp2200, MCP2200_DEVID_PRODUCT_STR, str);
+  }
+
+int mcp2200_set_pid_vid(struct mcp2200 *mcp2200, int pid, int vid){
+  int sent;
+
+  report[0]=MCP2200_CMD_SET_DEVID;
+  report[1]=MCP2200_DEVID_PID_VID_NUMBERS;
+  report[2]=vid&255;
+  report[3]=(vid>>8)&255;
+  report[2]=pid&255;
+  report[3]=(pid>>8)&255;
   return libusb_interrupt_transfer(
     mcp2200->handle, mcp2200->intout, report, 16, &sent, 5000
     );

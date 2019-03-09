@@ -44,6 +44,8 @@ int mcp2200_read_all(struct mcp2200 *mcp2200, struct mcp2200_conf *conf);
 int mcp2200_configure(struct mcp2200 *mcp2200, struct mcp2200_conf *conf);
 int mcp2200_read_eeprom(struct mcp2200 *mcp2200, int address);
 int mcp2200_write_eeprom(struct mcp2200 *mcp2200, int address, int data);
-
+int mcp2200_set_manufacturer_string(struct mcp2200 *mcp2200, char *str);
+int mcp2200_set_product_string(struct mcp2200 *mcp2200, char *str);
+int mcp2200_set_pid_vid(struct mcp2200 *mcp2200, int pid, int vid);
 
 #endif

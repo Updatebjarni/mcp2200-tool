@@ -108,6 +108,9 @@ int main(int argc, char *argv[]){
     {"help", no_argument, 0, 'h'},
     {"id", required_argument, 0, 'u'},
     {"port", required_argument, 0, 'U'},
+    {"set-vid-pid", required_argument, 0, '7'},
+    {"set-manufacturer", required_argument, 0, '8'},
+    {"set-product", required_argument, 0, '9'},
     {0, 0, 0, 0}
     };
   static struct option id_and_port_options[] = {
@@ -124,6 +127,7 @@ int main(int argc, char *argv[]){
   long val, err=0;
   int eewaddr, eedata;
   int do_configure=0;
+  unsigned new_vid, new_pid;
 
   opterr=0;
   while((opt=getopt_long(argc, argv, "+u:U:", id_and_port_options, 0))!=-1){
@@ -259,6 +263,20 @@ int main(int argc, char *argv[]){
         printf("pindefaults = 0x%.2X\n", c.pindefaults);
         printf("pinopts     = 0x%.2X\n", c.pinopts);
         printf("baudrate    = %ld\n", c.baudrate);
+        break;
+      case '7':
+        if(sscanf(optarg, "%x:%x%c", &new_vid, &new_pid, &dummy)!=2){
+          fprintf(stderr, "Specify device ID as \"VID:PID\"\n");
+          err=1;
+          break;
+          }
+        mcp2200_set_pid_vid(&m, new_pid, new_vid);
+        break;
+      case '8':
+        mcp2200_set_manufacturer_string(&m, optarg);
+        break;
+      case '9':
+        mcp2200_set_product_string(&m, optarg);
         break;
       case 'h':
       default:
